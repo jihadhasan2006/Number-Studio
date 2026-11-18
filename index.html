@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Number Studio – Mixer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+:root{--bg:#f5f6f8;--card:#fff;--navy:#17243a;--text:#263449;--muted:#7b8697;--border:#e7eaf0;--field:#fafbfd;--blue:#3459d5;--blue-soft:#edf1fc;--green:#16845b;--green-soft:#e8f5ee;--amber:#b4690e;--amber-soft:#fdf1e1;--btn-bg:#17243a;--btn-fg:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1622;--card:#182233;--navy:#e8edf6;--text:#cdd6e4;--muted:#8d99ad;--border:#263349;--field:#131c2b;--blue:#7d9bff;--blue-soft:#202d52;--green:#4fd1a0;--green-soft:#15312a;--amber:#f0b25c;--amber-soft:#3a2c17;--btn-bg:#e8edf6;--btn-fg:#17243a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1622;--card:#182233;--navy:#e8edf6;--text:#cdd6e4;--muted:#8d99ad;--border:#263349;--field:#131c2b;--blue:#7d9bff;--blue-soft:#202d52;--green:#4fd1a0;--green-soft:#15312a;--amber:#f0b25c;--amber-soft:#3a2c17;--btn-bg:#e8edf6;--btn-fg:#17243a;color-scheme:dark}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:40px 18px 60px}
+.wrapper{max-width:960px;margin:auto}
+button,select,input{font-family:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;gap:10px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-icon{width:43px;height:43px;background:var(--btn-bg);color:var(--btn-fg);border-radius:11px;display:grid;place-items:center;font-size:20px;font-weight:800}
+.brand-name{font-size:17px;font-weight:800;letter-spacing:-.4px;color:var(--navy)}
+.brand-sub{color:var(--muted);font-size:11px;margin-top:2px}
+.theme-btn{border:1px solid var(--border);background:var(--card);color:var(--text);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:16px}
+.intro{margin-bottom:22px}
+.intro h1{font-size:27px;font-weight:700;color:var(--navy);letter-spacing:-.8px}
+.intro p{color:var(--muted);font-size:13px;margin-top:6px}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.panel,.result-panel,.options{background:var(--card);border:1px solid var(--border);border-radius:13px;overflow:hidden}
+.panel-header{padding:15px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.panel-title{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:var(--navy)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--blue)}
+.panel:nth-child(2) .dot{background:#9b7acb}
+.mini{display:flex;gap:6px}
+.mini button,.mini label{border:1px solid var(--border);background:var(--field);color:var(--muted);font-size:11px;font-weight:600;padding:5px 9px;border-radius:6px;cursor:pointer}
+.mini button:hover,.mini label:hover{color:var(--text)}
+.panel-body{padding:14px 18px 16px}
+textarea{width:100%;height:190px;resize:vertical;border:1px solid var(--border);background:var(--field);border-radius:8px;padding:12px 14px;outline:none;color:var(--text);font-family:inherit;font-size:13px;line-height:1.9;transition:.2s}
+textarea:focus{border-color:var(--blue)}
+textarea::placeholder{color:var(--muted);opacity:.7}
+.panel-footer{display:flex;justify-content:space-between;padding-top:10px;color:var(--muted);font-size:11px}
+.warn{color:var(--amber);font-weight:600}
+.options{margin-top:18px;padding:16px 18px;display:grid;gap:14px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.row-label{font-size:12px;font-weight:700;color:var(--navy);min-width:78px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{border:1px solid var(--border);background:var(--field);color:var(--text);font-size:12px;font-weight:600;padding:7px 12px;border-radius:7px;cursor:pointer}
+.seg input:checked+label{background:var(--blue-soft);border-color:var(--blue);color:var(--blue)}
+.seg input:focus-visible+label{outline:2px solid var(--blue);outline-offset:2px}
+.pattern{display:none;align-items:center;gap:8px;font-size:12px}
+.pattern.on{display:flex}
+.pattern input{width:56px;border:1px solid var(--border);background:var(--field);color:var(--text);border-radius:6px;padding:6px 8px;font-size:12px}
+.checks{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:12px}
+.checks label{display:flex;align-items:center;gap:7px;cursor:pointer}
+select{border:1px solid var(--border);background:var(--field);color:var(--text);border-radius:6px;padding:6px 8px;font-size:12px}
+.action-area{display:flex;justify-content:center;padding:24px 0}
+.mix-btn{border:none;background:var(--btn-bg);color:var(--btn-fg);padding:13px 36px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:12px;transition:.2s}
+.mix-btn:hover{transform:translateY(-1px);opacity:.92}
+.mix-btn small{font-size:11px;font-weight:500;opacity:.6}
+.result-header{padding:16px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.result-heading{font-size:13px;font-weight:700;color:var(--navy)}
+.result-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.result-count{background:var(--blue-soft);color:var(--blue);padding:7px 11px;border-radius:6px;font-size:12px;font-weight:700}
+.result-body{padding:18px 20px}
+#finalResult{height:200px}
+.result-actions{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px;flex-wrap:wrap}
+#resultStatus{color:var(--muted);font-size:11px}
+.buttons{display:flex;gap:8px}
+.btn{border:1px solid var(--border);background:var(--card);color:var(--text);padding:10px 15px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer}
+.btn:hover{background:var(--field)}
+.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+:root[data-theme="dark"] .btn.primary{color:#0f1622}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.primary{color:#0f1622}}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--btn-bg);color:var(--btn-fg);padding:11px 18px;border-radius:8px;font-size:12px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:20;max-width:90vw}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.err{background:#c0392b;color:#fff}
+.footer{text-align:center;padding-top:26px;color:var(--muted);font-size:11px}
+@media(max-width:640px){body{padding:24px 12px 50px}.intro h1{font-size:23px}.panels{grid-template-columns:1fr;gap:12px}.row-label{min-width:100%}.buttons{width:100%}.btn{flex:1}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <header class="header">
+    <div class="brand">
+      <div class="brand-icon">N</div>
+      <div><div class="brand-name">Number Studio</div><div class="brand-sub">Sequential mixing tool</div></div>
+    </div>
+    <button class="theme-btn" id="themeBtn" title="Switch theme" aria-label="Switch theme">◐</button>
+  </header>
+
+  <section class="intro">
+    <h1>Number Mixer</h1>
+    <p>Combine two number lists in the order you choose. Separate numbers with a new line, space or comma.</p>
+  </section>
+
+  <section class="panels">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="dot"></span>First list</div>
+        <div class="mini">
+          <label for="file1">Open file</label><input type="file" id="file1" accept=".txt,.csv" hidden>
+          <button type="button" data-clear="listOne">Clear</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <textarea id="listOne" placeholder="Enter your first numbers…"></textarea>
+        <div class="panel-footer"><span id="warnOne"></span><span id="countOne">0 numbers</span></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="dot"></span>Second list</div>
+        <div class="mini">
+          <label for="file2">Open file</label><input type="file" id="file2" accept=".txt,.csv" hidden>
+          <button type="button" data-clear="listTwo">Clear</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <textarea id="listTwo" placeholder="Enter your second numbers…"></textarea>
+        <div class="panel-footer"><span id="warnTwo"></span><span id="countTwo">0 numbers</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="options">
+    <div class="row">
+      <span class="row-label">Mix style</span>
+      <div class="seg" id="modeSeg">
+        <input type="radio" name="mode" id="m1" value="alternate" checked><label for="m1">Alternate (A, B, A, B)</label>
+        <input type="radio" name="mode" id="m2" value="pattern"><label for="m2">Pattern</label>
+        <input type="radio" name="mode" id="m3" value="append"><label for="m3">A then B</label>
+        <input type="radio" name="mode" id="m4" value="shuffle"><label for="m4">Shuffle</label>
+      </div>
+      <div class="pattern" id="patternBox">
+        Take <input type="number" id="takeA" min="1" value="2"> from A, then <input type="number" id="takeB" min="1" value="1"> from B
+      </div>
+    </div>
+    <div class="row">
+      <span class="row-label">Clean up</span>
+      <div class="checks">
+        <label><input type="checkbox" id="optDup"> Remove duplicates</label>
+        <label><input type="checkbox" id="optNum"> Keep numbers only</label>
+        <label><input type="checkbox" id="optSort"> Sort result</label>
+      </div>
+    </div>
+    <div class="row">
+      <span class="row-label">Output</span>
+      <label class="checks" style="gap:8px">Separator
+        <select id="sep">
+          <option value="\n">New line</option>
+          <option value=", ">Comma</option>
+          <option value=" ">Space</option>
+          <option value="\t">Tab</option>
+        </select>
+      </label>
+      <button type="button" class="btn" id="swapBtn">⇅ Swap lists</button>
+    </div>
+  </section>
+
+  <div class="action-area">
+    <button class="mix-btn" id="mixBtn"><span>⇄</span> Mix numbers <small>Ctrl + Enter</small></button>
+  </div>
+
+  <section class="result-panel">
+    <div class="result-header">
+      <div><div class="result-heading">Final result</div><div class="result-sub">Your combined number sequence</div></div>
+      <div class="result-count" id="totalCount">0 total</div>
+    </div>
+    <div class="result-body">
+      <textarea id="finalResult" readonly placeholder="Your final result will appear here…"></textarea>
+      <div class="result-actions">
+        <span id="resultStatus">Waiting for input</span>
+        <div class="buttons">
+          <button class="btn" id="clearBtn">Clear all</button>
+          <button class="btn primary" id="copyBtn">Copy result</button>
+          <button class="btn" id="dlBtn">Download</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">Number Studio · Simple, precise, efficient</footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const one = $("listOne"), two = $("listTwo"), out = $("finalResult");
+let toastTimer;
+
+function toast(msg, err) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.className = "toast show" + (err ? " err" : "");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = "toast", 2400);
+}
+
+const isNum = x => x !== "" && Number.isFinite(Number(x));
+const getItems = v => v.split(/[\s,;]+/).filter(Boolean);
+const plural = n => n + (n === 1 ? " number" : " numbers");
+
+function updateCounts() {
+  [[one, "countOne", "warnOne"], [two, "countTwo", "warnTwo"]].forEach(([el, c, w]) => {
+    const items = getItems(el.value);
+    const bad = items.filter(x => !isNum(x)).length;
+    $(c).textContent = plural(items.length);
+    $(w).textContent = bad ? bad + " not a number" : "";
+    $(w).className = bad ? "warn" : "";
+  });
+}
+one.addEventListener("input", updateCounts);
+two.addEventListener("input", updateCounts);
+
+document.querySelectorAll('input[name="mode"]').forEach(r =>
+  r.addEventListener("change", () =>
+    $("patternBox").classList.toggle("on", document.querySelector('input[name="mode"]:checked').value === "pattern")));
+
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function mix() {
+  let a = getItems(one.value), b = getItems(two.value);
+  if (!a.length || !b.length) { toast("Enter numbers in both lists first.", true); return; }
+
+  let removed = 0;
+  if ($("optNum").checked) {
+    const before = a.length + b.length;
+    a = a.filter(isNum); b = b.filter(isNum);
+    removed = before - a.length - b.length;
+    if (!a.length || !b.length) { toast("One list has no valid numbers.", true); return; }
+  }
+
+  const mode = document.querySelector('input[name="mode"]:checked').value;
+  let res = [];
+  if (mode === "alternate") {
+    const max = Math.max(a.length, b.length);
+    for (let i = 0; i < max; i++) { if (i < a.length) res.push(a[i]); if (i < b.length) res.push(b[i]); }
+  } else if (mode === "pattern") {
+    const ta = Math.max(1, parseInt($("takeA").value) || 1), tb = Math.max(1, parseInt($("takeB").value) || 1);
+    let i = 0, j = 0;
+    while (i < a.length || j < b.length) {
+      res.push(...a.slice(i, i + ta)); i += ta;
+      res.push(...b.slice(j, j + tb)); j += tb;
+    }
+  } else if (mode === "append") {
+    res = a.concat(b);
+  } else {
+    res = shuffle(a.concat(b));
+  }
+
+  let dups = 0;
+  if ($("optDup").checked) {
+    const seen = new Set(), before = res.length;
+    res = res.filter(x => !seen.has(x) && seen.add(x));
+    dups = before - res.length;
+  }
+  if ($("optSort").checked) {
+    res.sort((x, y) => (isNum(x) && isNum(y)) ? Number(x) - Number(y) : x.localeCompare(y));
+  }
+
+  out.value = res.join($("sep").value);
+  $("totalCount").textContent = res.length + " total";
+  const notes = [];
+  if (dups) notes.push(dups + " duplicate" + (dups > 1 ? "s" : "") + " removed");
+  if (removed) notes.push(removed + " invalid skipped");
+  $("resultStatus").textContent = "Mix completed" + (notes.length ? " · " + notes.join(", ") : "");
+}
+
+$("mixBtn").addEventListener("click", mix);
+document.addEventListener("keydown", e => { if ((e.ctrlKey || e.metaKey) && e.key === "Enter") mix(); });
+$("sep").addEventListener("change", () => { if (out.value) mix(); });
+
+$("swapBtn").addEventListener("click", () => {
+  [one.value, two.value] = [two.value, one.value];
+  updateCounts();
+  toast("Lists swapped");
+});
+
+document.querySelectorAll("[data-clear]").forEach(b => b.addEventListener("click", () => {
+  $(b.dataset.clear).value = ""; updateCounts();
+}));
+
+[["file1", one], ["file2", two]].forEach(([id, el]) => {
+  $(id).addEventListener("change", e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { el.value = String(r.result).trim(); updateCounts(); toast("File loaded"); };
+    r.readAsText(f);
+    e.target.value = "";
+  });
+});
+
+$("copyBtn").addEventListener("click", async () => {
+  if (!out.value) { toast("There is no result to copy yet.", true); return; }
+  try {
+    await navigator.clipboard.writeText(out.value);
+  } catch (e) {
+    out.removeAttribute("readonly"); out.select(); document.execCommand("copy"); out.setAttribute("readonly", "");
+  }
+  $("resultStatus").textContent = "Copied to clipboard";
+  toast("Copied");
+});
+
+$("dlBtn").addEventListener("click", () => {
+  if (!out.value) { toast("There is no result to download yet.", true); return; }
+  const blob = new Blob([out.value], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "final-numbers.txt";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+
+$("clearBtn").addEventListener("click", () => {
+  one.value = two.value = out.value = "";
+  updateCounts();
+  $("totalCount").textContent = "0 total";
+  $("resultStatus").textContent = "Waiting for input";
+});
+
+$("themeBtn").addEventListener("click", () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+});
+</script>
+</body>
+</html>
